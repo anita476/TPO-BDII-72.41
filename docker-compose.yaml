@@ -16,7 +16,7 @@ services:
       - redis_data:/data
     environment:
       REDIS_PASSWORD: redisgrupo8
-    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}
+    command: redis-server --appendonly yes
 
 volumes:
   mongo_data:
