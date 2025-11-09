@@ -4,7 +4,10 @@
 
 ```
 npm install 
-npm run start // inicia contenedores también
+npm start // inicia contenedores también
+
+para especificar directorio de datasets:
+npm start path/to/datasets
 ```
 #### Solo Docker-compose
 ```
