@@ -6,6 +6,7 @@ import connectMongoDB from "./config/mongodb.js";
 import mongoose from "mongoose";
 import redis from "./config/redis.js";
 import { importAllCSVFiles } from "./services/csvImporterService.js";
+import queryRoutes from "./routes/queryRoutes.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -40,6 +41,8 @@ app.use((req, res, next) => {
   console.log(`${req.method} ${req.url}`);
   next();
 });
+
+app.use('/queries',queryRoutes)
 
 process.on("SIGINT", async () => {
   console.log("\nStopping containers...");
