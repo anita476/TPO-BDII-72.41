@@ -5,3 +5,8 @@ package-lock.json
 datasets/*
 .DS_Store
 .idea
+clientes.csv
+polizas.csv
+siniestros.csv
+vehiculos.csv
+agentes.csv
