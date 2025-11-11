@@ -23,6 +23,7 @@ startServer();
 app.get("/", (req, res) => {
   res.send("Containers are up and Express is running!");
 });
+
 // to check if the db are still connected ....
 app.get("/health", async (req, res) => {
   const mongoStatus = mongoose.connection.readyState === 1 ? "ok" : "error";
@@ -42,7 +43,7 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use('/queries',queryRoutes)
+app.use("/queries", queryRoutes);
 
 process.on("SIGINT", async () => {
   console.log("\nStopping containers...");
@@ -51,6 +52,7 @@ process.on("SIGINT", async () => {
 });
 
 /*************HELPERS **********/
+
 async function startServer() {
   try {
     await connectMongoDB();

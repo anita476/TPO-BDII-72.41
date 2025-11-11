@@ -67,36 +67,40 @@ async function importCSVFile(filePath, fileName, Model) {
 
     // Clear existing data in the collection
     await Model.deleteMany({});
-      try {
-          await Model.collection.dropIndexes();
-      } catch (indexError) {
-          console.log("Could not drop indexes:", indexError.message);
+    try {
+      await Model.collection.dropIndexes();
+    } catch (indexError) {
+      console.log("Could not drop indexes:", indexError.message);
+    }
+
+    // Transform records to match schema types
+    const transformedRecords = records.map((record) => {
+      const transformed = { ...record };
+
+      // Convert numeric fields (common to multiple models)
+      if (transformed.id_cliente)
+        transformed.id_cliente = parseInt(transformed.id_cliente);
+      if (transformed.dni) transformed.dni = parseInt(transformed.dni);
+      if (transformed.id_vehiculo)
+        transformed.id_vehiculo = parseInt(transformed.id_vehiculo);
+      if (transformed.anio) transformed.anio = parseInt(transformed.anio);
+
+      // Convert boolean fields
+      if (transformed.activo !== undefined) {
+        transformed.activo = transformed.activo === "True";
       }
-
-      // Transform records to match schema types
-      const transformedRecords = records.map(record => {
-          const transformed = { ...record };
-
-          // Convert numeric fields (common to multiple models)
-          if (transformed.id_cliente) transformed.id_cliente = parseInt(transformed.id_cliente);
-          if (transformed.dni) transformed.dni = parseInt(transformed.dni);
-          if (transformed.id_vehiculo) transformed.id_vehiculo = parseInt(transformed.id_vehiculo);
-          if (transformed.anio) transformed.anio = parseInt(transformed.anio);
-
-          // Convert boolean fields
-          if (transformed.activo !== undefined) {
-              transformed.activo = transformed.activo === 'True';
-          }
-          if (transformed.asegurado !== undefined) {
-              transformed.asegurado = transformed.asegurado === 'True';
-          }
-          return transformed;
-      });
+      if (transformed.asegurado !== undefined) {
+        transformed.asegurado = transformed.asegurado === "True";
+      }
+      return transformed;
+    });
 
     // Insert all records
     //TODO add insertion order
-    console.log("RECORDS " , transformedRecords.length);
-    const result = await Model.insertMany(transformedRecords, { ordered: false });
+    console.log("RECORDS ", transformedRecords.length);
+    const result = await Model.insertMany(transformedRecords, {
+      ordered: false,
+    });
     console.log(`Imported ${result.length} records from ${fileName}`);
   } catch (error) {
     if (error.code === 11000) {
@@ -203,4 +207,5 @@ async function importPolizasEmbedded(filePath) {
     console.error(`Error importing polizas:`, error.message);
   }
 }
+
 export { importAllCSVFiles, importCSVFile, readCSV };
