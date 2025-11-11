@@ -1,4 +1,4 @@
-import redis from "../config/redis.js";
+import { getJson, setJson } from "../utils/redisUtils.js";
 import cliente from "../models/Cliente.js";
 
 // El top 10 cambia poco, por lo que tiene sentido cachearlo
@@ -8,9 +8,9 @@ export async function query7(req, res) {
     const cacheKey = "query7:top10-clientes:all-polizas:v3";
     const cacheTtlSeconds = 600;
 
-    const cache = await redis.get(cacheKey);
+    const cache = await getJson(cacheKey);
     if (cache) {
-      return res.json(JSON.parse(cache));
+      return res.json(cache);
     }
 
     const pipeline = [
@@ -58,7 +58,7 @@ export async function query7(req, res) {
     ];
 
     const respuesta = await cliente.aggregate(pipeline).exec();
-    await redis.set(cacheKey, JSON.stringify(respuesta), "EX", cacheTtlSeconds);
+    await setJson(cacheKey, respuesta, cacheTtlSeconds);
     res.json(respuesta);
   } catch (error) {
     console.error("Error en query7:", error);
