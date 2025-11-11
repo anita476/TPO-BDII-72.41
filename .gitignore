@@ -4,3 +4,4 @@ package-lock.json
 # exclude datasets
 datasets/*
 .DS_Store
+.idea
