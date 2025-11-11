@@ -1,14 +1,11 @@
 import fs from "fs";
 import path from "path";
 import { parse } from "csv-parse";
-import { fileURLToPath } from "url";
 import Cliente from "../models/Cliente.js";
 import Siniestro from "../models/Siniestro.js";
 import Agente from "../models/Agente.js";
 import Vehiculo from "../models/Vehiculo.js";
 import mongoose from "mongoose";
-
-const __filename = fileURLToPath(import.meta.url);
 
 // Define which model to use for each CSV file
 const MODEL_MAPPING = {
@@ -176,6 +173,7 @@ async function importAllCSVFiles(customPath) {
     console.error("Error during CSV import:", error);
   }
 }
+
 async function importPolizasEmbedded(filePath) {
   try {
     console.log(`\nImporting polizas.csv as embedded documents...`);
