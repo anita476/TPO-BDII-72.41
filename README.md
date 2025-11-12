@@ -23,16 +23,25 @@ docker-compose down
 
 ## Endpoints principales
 
-- Consultas (queries 1-12):
-  - `GET /queries/query1`
-  - ...
-  - `GET /queries/query12`
-- ABM de clientes (query 13):
+- Clientes (query 13):
+
   - `GET /clientes`
   - `GET /clientes/:id`
   - `POST /clientes`
   - `PUT /clientes/:id`
   - `DELETE /clientes/:id`
+
+- Siniestros (query 14):
+
+  - `GET /siniestros`
+  - `GET /siniestros/:id`
+  - `POST /siniestros`
+
+- Pólizas (query 15):
+
+  - `GET /polizas`
+  - `GET /polizas/:nro_poliza`
+  - `POST /polizas`
 
 ## Ejemplos de uso (curl)
 
@@ -59,7 +68,7 @@ docker-compose down
   curl http://localhost:3000/queries/query7
   ```
 
-### ABM de clientes (query 13)
+### Clientes (query 13)
 
 - **Listar todos**
   ```
@@ -107,4 +116,56 @@ docker-compose down
 - **Eliminar cliente**
   ```
   curl -X DELETE http://localhost:3000/clientes/206
+  ```
+
+### Siniestros
+
+- **Listar todos**
+  ```
+  curl http://localhost:3000/siniestros
+  ```
+- **Obtener por id**
+  ```
+  curl http://localhost:3000/siniestros/9001
+  ```
+- **Crear siniestro**
+  ```
+  curl -X POST http://localhost:3000/siniestros \
+    -H "Content-Type: application/json" \
+    -d '{
+      "id_siniestro": 10001,
+      "nro_poliza": "POL1001",
+      "fecha": "15/12/2024",
+      "tipo": "Accidente",
+      "monto_estimado": 250000,
+      "descripcion": "Colisión trasera en semáforo",
+      "estado": "Abierto"
+    }'
+  ```
+
+### Pólizas
+
+- **Listar todas**
+  ```
+  curl http://localhost:3000/polizas
+  ```
+- **Obtener por número de póliza**
+  ```
+  curl http://localhost:3000/polizas/POL1001
+  ```
+- **Emitir nueva póliza**
+  ```
+  curl -X POST http://localhost:3000/polizas \
+    -H "Content-Type: application/json" \
+    -d '{
+      "id_cliente": 1,
+      "nro_poliza": "POL2001",
+      "tipo": "Auto",
+      "fecha_inicio": "1/1/2025",
+      "fecha_fin": "1/1/2026",
+      "prima_mensual": 30000,
+      "cobertura_total": 3000000,
+      "id_agente": 101,
+      "estado": "Activa"
+    }'
   ```
