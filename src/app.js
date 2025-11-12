@@ -8,6 +8,7 @@ import redis from "./config/redis.js";
 import { importAllCSVFiles } from "./services/csvImporterService.js";
 import queryRoutes from "./routes/queryRoutes.js";
 import clientesRoutes from "./routes/clientesRoutes.js";
+import siniestrosRoutes from "./routes/siniestrosRoutes.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -46,6 +47,7 @@ app.use((req, res, next) => {
 
 app.use("/queries", queryRoutes);
 app.use("/clientes", clientesRoutes);
+app.use("/siniestros", siniestrosRoutes);
 
 process.on("SIGINT", async () => {
   console.log("\nStopping containers...");
