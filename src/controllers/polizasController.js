@@ -193,7 +193,6 @@ export async function createPolicy(req, res) {
     return res.status(400).json({ mensaje: errors.join(" ") });
   }
 
-  // Validar campos obligatorios
   for (const field of REQUIRED_FIELDS) {
     if (payload[field] === undefined || payload[field] === null) {
       return res.status(400).json({
@@ -202,7 +201,6 @@ export async function createPolicy(req, res) {
     }
   }
 
-  // Validar que se proporcione id_cliente
   const idCliente = Number(req.body.id_cliente);
   if (Number.isNaN(idCliente)) {
     return res.status(400).json({
@@ -211,7 +209,6 @@ export async function createPolicy(req, res) {
   }
 
   try {
-    // Validar que el cliente exista
     const cliente = await Cliente.findOne({ id_cliente: idCliente });
 
     if (!cliente) {
@@ -220,7 +217,6 @@ export async function createPolicy(req, res) {
       });
     }
 
-    // Validar que el agente exista
     const agente = await Agente.findOne({ id_agente: payload.id_agente });
 
     if (!agente) {
@@ -229,14 +225,12 @@ export async function createPolicy(req, res) {
       });
     }
 
-    // Validar que el agente esté activo
     if (!agente.activo) {
       return res.status(400).json({
         mensaje: "El agente no está activo.",
       });
     }
 
-    // Validar que el número de póliza sea único
     const existingPoliza = await Cliente.findOne({
       "polizas.nro_poliza": payload.nro_poliza,
     });
@@ -247,20 +241,17 @@ export async function createPolicy(req, res) {
       });
     }
 
-    // Agregar id_cliente a la póliza
     const nuevaPoliza = {
       ...payload,
       id_cliente: idCliente,
     };
 
-    // Agregar la póliza al cliente
     const updatedCliente = await Cliente.findOneAndUpdate(
       { id_cliente: idCliente },
       { $push: { polizas: nuevaPoliza } },
       { new: true }
     );
 
-    // Obtener la póliza recién creada
     const polizaCreada = updatedCliente.polizas.find(
       (p) => p.nro_poliza === payload.nro_poliza
     );
