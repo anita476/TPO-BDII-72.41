@@ -1,5 +1,6 @@
 import Siniestro from "../models/Siniestro.js";
 import { deleteKey } from "../utils/redisUtils.js";
+import { HTTP_STATUS } from "../utils/errors.js";
 
 const REQUIRED_FIELDS = [
   "id_siniestro",
@@ -101,7 +102,7 @@ export async function listClaims(req, res) {
     res.json(claims);
   } catch (error) {
     console.error("Error al listar siniestros:", error);
-    res.status(500).json({
+    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
       mensaje: "No fue posible obtener la lista de siniestros.",
     });
   }
@@ -113,7 +114,7 @@ export async function getClaim(req, res) {
   const claimId = Number(id);
 
   if (Number.isNaN(claimId)) {
-    return res.status(400).json({
+    return res.status(HTTP_STATUS.BAD_REQUEST).json({
       mensaje: "El id del siniestro debe ser numérico.",
     });
   }
@@ -122,13 +123,13 @@ export async function getClaim(req, res) {
     const claim = await Siniestro.findOne({ id_siniestro: claimId });
 
     if (!claim) {
-      return res.status(404).json({ mensaje: "Siniestro no encontrado." });
+      return res.status(HTTP_STATUS.NOT_FOUND).json({ mensaje: "Siniestro no encontrado." });
     }
 
     res.json(claim);
   } catch (error) {
     console.error("Error al obtener siniestro:", error);
-    res.status(500).json({
+    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
       mensaje: "No fue posible obtener los datos del siniestro.",
     });
   }
@@ -141,12 +142,12 @@ export async function createClaim(req, res) {
   });
 
   if (errors.length > 0) {
-    return res.status(400).json({ mensaje: errors.join(" ") });
+    return res.status(HTTP_STATUS.BAD_REQUEST).json({ mensaje: errors.join(" ") });
   }
 
   for (const field of REQUIRED_FIELDS) {
     if (payload[field] === undefined || payload[field] === null) {
-      return res.status(400).json({
+      return res.status(HTTP_STATUS.BAD_REQUEST).json({
         mensaje: `El campo '${field}' es obligatorio.`,
       });
     }
@@ -158,16 +159,16 @@ export async function createClaim(req, res) {
     });
 
     if (existingClaim) {
-      return res.status(409).json({
+      return res.status(HTTP_STATUS.CONFLICT).json({
         mensaje: "Ya existe un siniestro con ese id_siniestro.",
       });
     }
 
     const newClaim = await Siniestro.create(payload);
     await invalidateClaimCaches();
-    res.status(201).json(newClaim);
+    res.status(HTTP_STATUS.CREATED).json(newClaim);
   } catch (error) {
     console.error("Error al crear siniestro:", error);
-    res.status(500).json({ mensaje: "No fue posible crear el siniestro." });
+    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ mensaje: "No fue posible crear el siniestro." });
   }
 }

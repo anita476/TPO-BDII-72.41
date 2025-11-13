@@ -2,10 +2,18 @@
 services:
   mongodb:
     image: mongo:7
+    hostname: mongodb
+    command: ["--replSet", "rs0", "--bind_ip_all"]
     ports:
       - "27017:27017"
     volumes:
       - mongo_data:/data/db
+    healthcheck:
+      test: mongosh --quiet --eval "try { rs.status(); } catch(e) { rs.initiate(); }" || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
 
   redis:
     image: redis:latest

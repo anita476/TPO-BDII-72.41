@@ -1,7 +1,9 @@
+import mongoose from "mongoose";
 import Cliente from "../models/Cliente.js";
 import Vehiculo from "../models/Vehiculo.js";
 import Siniestro from "../models/Siniestro.js";
 import { deleteKey } from "../utils/redisUtils.js";
+import { HttpError, handleError, HTTP_STATUS } from "../utils/errors.js";
 
 const REQUIRED_FIELDS = [
   "id_cliente",
@@ -113,7 +115,7 @@ export async function listClients(req, res) {
     res.json(clients);
   } catch (error) {
     console.error("Error al listar clientes:", error);
-    res.status(500).json({
+    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
       mensaje: "No fue posible obtener la lista de clientes.",
     });
   }
@@ -125,7 +127,7 @@ export async function getClient(req, res) {
   const clientId = Number(id);
 
   if (Number.isNaN(clientId)) {
-    return res.status(400).json({
+    return res.status(HTTP_STATUS.BAD_REQUEST).json({
       mensaje: "El id del cliente debe ser numérico.",
     });
   }
@@ -134,13 +136,13 @@ export async function getClient(req, res) {
     const client = await Cliente.findOne({ id_cliente: clientId });
 
     if (!client) {
-      return res.status(404).json({ mensaje: "Cliente no encontrado." });
+      return res.status(HTTP_STATUS.NOT_FOUND).json({ mensaje: "Cliente no encontrado." });
     }
 
     res.json(client);
   } catch (error) {
     console.error("Error al obtener cliente:", error);
-    res.status(500).json({
+    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
       mensaje: "No fue posible obtener los datos del cliente.",
     });
   }
@@ -153,12 +155,12 @@ export async function createClient(req, res) {
   });
 
   if (errors.length > 0) {
-    return res.status(400).json({ mensaje: errors.join(" ") });
+    return res.status(HTTP_STATUS.BAD_REQUEST).json({ mensaje: errors.join(" ") });
   }
 
   for (const field of REQUIRED_FIELDS) {
     if (payload[field] === undefined || payload[field] === null) {
-      return res.status(400).json({
+      return res.status(HTTP_STATUS.BAD_REQUEST).json({
         mensaje: `El campo '${field}' es obligatorio.`,
       });
     }
@@ -170,17 +172,17 @@ export async function createClient(req, res) {
     });
 
     if (existingClient) {
-      return res.status(409).json({
+      return res.status(HTTP_STATUS.CONFLICT).json({
         mensaje: "Ya existe un cliente con ese id_cliente o DNI.",
       });
     }
 
     const newClient = await Cliente.create(payload);
     await invalidateClientCaches();
-    res.status(201).json(newClient);
+    res.status(HTTP_STATUS.CREATED).json(newClient);
   } catch (error) {
     console.error("Error al crear cliente:", error);
-    res.status(500).json({ mensaje: "No fue posible crear el cliente." });
+    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ mensaje: "No fue posible crear el cliente." });
   }
 }
 
@@ -190,7 +192,7 @@ export async function updateClient(req, res) {
   const clientId = Number(id);
 
   if (Number.isNaN(clientId)) {
-    return res.status(400).json({
+    return res.status(HTTP_STATUS.BAD_REQUEST).json({
       mensaje: "El id del cliente debe ser numérico.",
     });
   }
@@ -200,7 +202,7 @@ export async function updateClient(req, res) {
   });
 
   if (errors.length > 0) {
-    return res.status(400).json({ mensaje: errors.join(" ") });
+    return res.status(HTTP_STATUS.BAD_REQUEST).json({ mensaje: errors.join(" ") });
   }
 
   try {
@@ -211,14 +213,14 @@ export async function updateClient(req, res) {
     );
 
     if (!updatedClient) {
-      return res.status(404).json({ mensaje: "Cliente no encontrado." });
+      return res.status(HTTP_STATUS.NOT_FOUND).json({ mensaje: "Cliente no encontrado." });
     }
 
     await invalidateClientCaches();
     res.json(updatedClient);
   } catch (error) {
     console.error("Error al actualizar cliente:", error);
-    res.status(500).json({ mensaje: "No fue posible actualizar el cliente." });
+    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ mensaje: "No fue posible actualizar el cliente." });
   }
 }
 
@@ -228,39 +230,53 @@ export async function deleteClient(req, res) {
   const clientId = Number(id);
 
   if (Number.isNaN(clientId)) {
-    return res.status(400).json({
+    return res.status(HTTP_STATUS.BAD_REQUEST).json({
       mensaje: "El id del cliente debe ser numérico.",
     });
   }
 
+  const session = await mongoose.startSession();
+
   try {
-    const client = await Cliente.findOne({ id_cliente: clientId });
+    const result = await session.withTransaction(async () => {
+      // 1. Obtener cliente dentro de transacción
+      const client = await Cliente.findOne({ id_cliente: clientId }).session(
+        session
+      );
 
-    if (!client) {
-      return res.status(404).json({ mensaje: "Cliente no encontrado." });
-    }
+      if (!client) {
+        throw new HttpError("Cliente no encontrado.", HTTP_STATUS.NOT_FOUND);
+      }
 
-    const numerosPoliza = client.polizas
-      ? client.polizas.map((poliza) => poliza.nro_poliza)
-      : [];
+      const numerosPoliza = client.polizas
+        ? client.polizas.map((poliza) => poliza.nro_poliza)
+        : [];
 
-    // ON CASCADE DELETE
-    await Promise.all([
-      Vehiculo.deleteMany({ id_cliente: clientId }),
-      numerosPoliza.length > 0
-        ? Siniestro.deleteMany({ nro_poliza: { $in: numerosPoliza } })
-        : Promise.resolve(),
-    ]);
+      // 2. Eliminar en cascada (todo dentro de la transacción)
+      await Vehiculo.deleteMany({ id_cliente: clientId }, { session });
 
-    await Cliente.findOneAndDelete({ id_cliente: clientId });
+      if (numerosPoliza.length > 0) {
+        await Siniestro.deleteMany(
+          { nro_poliza: { $in: numerosPoliza } },
+          { session }
+        );
+      }
 
+      await Cliente.findOneAndDelete({ id_cliente: clientId }, { session });
+
+      return client;
+    });
+
+    // 3. Invalidar caches DESPUÉS de commit exitoso
     await invalidateClientCaches();
+
     res.json({
       mensaje:
         "Cliente eliminado correctamente con sus pólizas, vehículos y siniestros.",
     });
   } catch (error) {
-    console.error("Error al eliminar cliente:", error);
-    res.status(500).json({ mensaje: "No fue posible eliminar el cliente." });
+    handleError(error, res, "No fue posible eliminar el cliente.");
+  } finally {
+    session.endSession();
   }
 }

@@ -1,6 +1,8 @@
+import mongoose from "mongoose";
 import Cliente from "../models/Cliente.js";
 import Agente from "../models/Agente.js";
 import { deleteKey } from "../utils/redisUtils.js";
+import { HttpError, handleError, HTTP_STATUS } from "../utils/errors.js";
 
 const REQUIRED_FIELDS = [
   "nro_poliza",
@@ -141,7 +143,7 @@ export async function listPolicy(req, res) {
     res.json(allPolizas);
   } catch (error) {
     console.error("Error al listar pólizas:", error);
-    res.status(500).json({
+    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
       mensaje: "No fue posible obtener la lista de pólizas.",
     });
   }
@@ -153,7 +155,7 @@ export async function getPolicy(req, res) {
   const nroPoliza = String(id).trim();
 
   if (nroPoliza === "") {
-    return res.status(400).json({
+    return res.status(HTTP_STATUS.BAD_REQUEST).json({
       mensaje: "El número de póliza no puede estar vacío.",
     });
   }
@@ -164,13 +166,13 @@ export async function getPolicy(req, res) {
     });
 
     if (!cliente) {
-      return res.status(404).json({ mensaje: "Póliza no encontrada." });
+      return res.status(HTTP_STATUS.NOT_FOUND).json({ mensaje: "Póliza no encontrada." });
     }
 
     const poliza = cliente.polizas.find((p) => p.nro_poliza === nroPoliza);
 
     if (!poliza) {
-      return res.status(404).json({ mensaje: "Póliza no encontrada." });
+      return res.status(HTTP_STATUS.NOT_FOUND).json({ mensaje: "Póliza no encontrada." });
     }
 
     res.json({
@@ -179,7 +181,7 @@ export async function getPolicy(req, res) {
     });
   } catch (error) {
     console.error("Error al obtener póliza:", error);
-    res.status(500).json({
+    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
       mensaje: "No fue posible obtener los datos de la póliza.",
     });
   }
@@ -190,12 +192,12 @@ export async function createPolicy(req, res) {
   const { parsed: payload, errors } = normalizePolicyPayload(req.body);
 
   if (errors.length > 0) {
-    return res.status(400).json({ mensaje: errors.join(" ") });
+    return res.status(HTTP_STATUS.BAD_REQUEST).json({ mensaje: errors.join(" ") });
   }
 
   for (const field of REQUIRED_FIELDS) {
     if (payload[field] === undefined || payload[field] === null) {
-      return res.status(400).json({
+      return res.status(HTTP_STATUS.BAD_REQUEST).json({
         mensaje: `El campo '${field}' es obligatorio.`,
       });
     }
@@ -203,66 +205,75 @@ export async function createPolicy(req, res) {
 
   const idCliente = Number(req.body.id_cliente);
   if (Number.isNaN(idCliente)) {
-    return res.status(400).json({
+    return res.status(HTTP_STATUS.BAD_REQUEST).json({
       mensaje: "El campo 'id_cliente' es obligatorio y debe ser numérico.",
     });
   }
 
+  const session = await mongoose.startSession();
+
   try {
-    const cliente = await Cliente.findOne({ id_cliente: idCliente });
+    const result = await session.withTransaction(async () => {
+      // 1. Verificar cliente existe
+      const cliente = await Cliente.findOne({ id_cliente: idCliente }).session(
+        session
+      );
 
-    if (!cliente) {
-      return res.status(404).json({
-        mensaje: "Cliente no encontrado.",
-      });
-    }
+      if (!cliente) {
+        throw new HttpError("Cliente no encontrado.", HTTP_STATUS.NOT_FOUND);
+      }
 
-    const agente = await Agente.findOne({ id_agente: payload.id_agente });
+      // 2. Verificar agente existe y está activo
+      const agente = await Agente.findOne({
+        id_agente: payload.id_agente,
+      }).session(session);
 
-    if (!agente) {
-      return res.status(404).json({
-        mensaje: "Agente no encontrado.",
-      });
-    }
+      if (!agente) {
+        throw new HttpError("Agente no encontrado.", HTTP_STATUS.NOT_FOUND);
+      }
 
-    if (!agente.activo) {
-      return res.status(400).json({
-        mensaje: "El agente no está activo.",
-      });
-    }
+      if (!agente.activo) {
+        throw new HttpError("El agente no está activo.", HTTP_STATUS.BAD_REQUEST);
+      }
 
-    const existingPoliza = await Cliente.findOne({
-      "polizas.nro_poliza": payload.nro_poliza,
+      // 3. Verificar que póliza no existe
+      const existingPoliza = await Cliente.findOne({
+        "polizas.nro_poliza": payload.nro_poliza,
+      }).session(session);
+
+      if (existingPoliza) {
+        throw new HttpError("Ya existe una póliza con ese número.", HTTP_STATUS.CONFLICT);
+      }
+
+      // 4. Crear póliza
+      const nuevaPoliza = {
+        ...payload,
+        id_cliente: idCliente,
+      };
+
+      const updatedCliente = await Cliente.findOneAndUpdate(
+        { id_cliente: idCliente },
+        { $push: { polizas: nuevaPoliza } },
+        { new: true, session }
+      );
+
+      const polizaCreada = updatedCliente.polizas.find(
+        (p) => p.nro_poliza === payload.nro_poliza
+      );
+
+      return {
+        ...polizaCreada.toObject(),
+        id_cliente: idCliente,
+      };
     });
 
-    if (existingPoliza) {
-      return res.status(409).json({
-        mensaje: "Ya existe una póliza con ese número.",
-      });
-    }
-
-    const nuevaPoliza = {
-      ...payload,
-      id_cliente: idCliente,
-    };
-
-    const updatedCliente = await Cliente.findOneAndUpdate(
-      { id_cliente: idCliente },
-      { $push: { polizas: nuevaPoliza } },
-      { new: true }
-    );
-
-    const polizaCreada = updatedCliente.polizas.find(
-      (p) => p.nro_poliza === payload.nro_poliza
-    );
-
+    // 5. Invalidar caches DESPUÉS de commit exitoso
     await invalidatePolicyCaches();
-    res.status(201).json({
-      ...polizaCreada.toObject(),
-      id_cliente: idCliente,
-    });
+
+    res.status(HTTP_STATUS.CREATED).json(result);
   } catch (error) {
-    console.error("Error al crear póliza:", error);
-    res.status(500).json({ mensaje: "No fue posible crear la póliza." });
+    handleError(error, res, "No fue posible crear la póliza.");
+  } finally {
+    session.endSession();
   }
 }
