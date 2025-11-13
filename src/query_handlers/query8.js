@@ -1,40 +1,64 @@
+import { withCache } from "../utils/cacheWrapper.js";
+import { QUERY_TTL_MAP } from "../constants/cacheTTL.js";
 import siniestro from "../models/Siniestro.js";
-import vehiculo from "../models/Vehiculo.js";
 
+export async function query8(req, res) {
+  await withCache({
+    cacheKey: "query8:siniestros-accidentes-ultimo-anio:v1",
+    ttl: QUERY_TTL_MAP.query8,
+    queryFn: async () => {
+      const now = new Date();
+      const currentYear = now.getFullYear();
+      const yearStart = new Date(currentYear, 0, 1);
+      const today = new Date(currentYear, now.getMonth(), now.getDate());
 
-//NO ANDA
-export async function query8(req,res) {
-    const now = new Date();
-    const lastYearStart = new Date(now.getFullYear() - 1, 0, 1);
-    const lastYearEnd = new Date(now.getFullYear(), 0, 1);
-    const vehi = siniestro.aggregate([
+      const result = await siniestro.aggregate([
         {
-            $addFields: {
-                fechaDate: {
-                    $dateFromString: {
-                        dateString: "$fecha",
-                        format: "%d/%m/%Y"
-                    }
-                }
-            }
+          $match: {
+            tipo: "Accidente",
+          },
         },
         {
-            $match: {
-                tipo: "Accidente",
-                fechaDate: {
-                    $gte: new Date(`${lastYearStart}-01-01`),
-                    $lt: new Date(`${now.getFullYear()}-01-01`)
-                }
-            }
+          $addFields: {
+            fechaDate: {
+              $dateFromParts: {
+                year: {
+                  $toInt: {
+                    $arrayElemAt: [{ $split: ["$fecha", "/"] }, 2],
+                  },
+                },
+                month: {
+                  $toInt: {
+                    $arrayElemAt: [{ $split: ["$fecha", "/"] }, 1],
+                  },
+                },
+                day: {
+                  $toInt: {
+                    $arrayElemAt: [{ $split: ["$fecha", "/"] }, 0],
+                  },
+                },
+              },
+            },
+          },
         },
         {
-            $project: {
-                fechaDate: 0  // Remove temporary field from results
-            }
-        }
-    ])
-    const resp = await vehi.exec()
-    console.log("RES\n")
-    console.log(resp)
-    res.json(resp)
+          $match: {
+            fechaDate: {
+              $gte: yearStart,
+              $lte: today,
+            },
+          },
+        },
+        {
+          $project: {
+            fechaDate: 0,
+          },
+        },
+      ]);
+      return result;
+    },
+    res,
+    errorMessage:
+      "No fue posible obtener los siniestros tipo Accidente del último año.",
+  });
 }

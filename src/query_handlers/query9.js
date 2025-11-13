@@ -1,41 +1,20 @@
-import siniestro from "../models/Siniestro.js";
-import vehiculo from "../models/Vehiculo.js";
-import cliente from "../models/Cliente.js";
+import { withCache } from "../utils/cacheWrapper.js";
+import { QUERY_TTL_MAP } from "../constants/cacheTTL.js";
+import mongoose from "mongoose";
 
-
-
-export async function query9(req,res) {
-    const cli = cliente.aggregate([
-        {
-            $unwind: "$polizas"
-        },
-        {
-            $match: { "polizas.estado": "Activa" }
-        },
-        {
-            $addFields: {
-                "polizas.fecha_inicio_date": {
-                    $dateFromString: {
-                        dateString: "$polizas.fecha_inicio",
-                        format: "%d/%m/%Y"
-                    }
-                }
-            }
-        },
-        {
-            $sort: { "polizas.fecha_inicio_date": -1 }
-        },
-        {
-            $unset: "polizas.fecha_inicio_date"
-        },
-        {
-            $project: {
-                pol: "$polizas"
-            }
-        }
-    ])
-    const resp = await cli.exec()
-    console.log("RES\n")
-    console.log(resp)
-    res.json(resp)
+export async function query9(req, res) {
+  await withCache({
+    cacheKey: "query9:polizas-activas:v1",
+    ttl: QUERY_TTL_MAP.query9,
+    queryFn: async () => {
+      const db = mongoose.connection.db;
+      const result = await db
+        .collection("polizas_activas_vista")
+        .find({})
+        .toArray();
+      return result;
+    },
+    res,
+    errorMessage: "No fue posible obtener las pólizas activas.",
+  });
 }

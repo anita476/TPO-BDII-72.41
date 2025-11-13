@@ -1,35 +1,20 @@
-import { getJson, setJson } from "../utils/redisUtils.js";
-import cliente from "../models/Cliente.js";
+import { withCache } from "../utils/cacheWrapper.js";
+import { QUERY_TTL_MAP } from "../constants/cacheTTL.js";
+import mongoose from "mongoose";
 
 export async function query10(req, res) {
-  try {
-    const cacheKey = "query10:polizas-suspendidas:v1";
-    const cacheTtlSeconds = 300;
-
-    const cache = await getJson(cacheKey);
-    if (cache) {
-      return res.json(cache);
-    }
-
-    const cli = cliente.aggregate([
-      { $unwind: "$polizas" },
-      {
-        $match: { "polizas.estado": "Suspendida" },
-      },
-      {
-        $project: {
-          estadoCliente: "$activo",
-          polizas: 1,
-        },
-      },
-    ]);
-    const resp = await cli.exec();
-    await setJson(cacheKey, resp, cacheTtlSeconds);
-    res.json(resp);
-  } catch (error) {
-    console.error("Error en query10:", error);
-    res.status(500).json({
-      mensaje: "No fue posible obtener las pólizas suspendidas.",
-    });
-  }
+  await withCache({
+    cacheKey: "query10:polizas-suspendidas:v1",
+    ttl: QUERY_TTL_MAP.query10,
+    queryFn: async () => {
+      const db = mongoose.connection.db;
+      const result = await db
+        .collection("polizas_suspendidas_vista")
+        .find({})
+        .toArray();
+      return result;
+    },
+    res,
+    errorMessage: "No fue posible obtener las pólizas suspendidas.",
+  });
 }

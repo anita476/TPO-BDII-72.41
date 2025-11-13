@@ -6,6 +6,12 @@ import connectMongoDB from "./config/mongodb.js";
 import mongoose from "mongoose";
 import redis from "./config/redis.js";
 import { importAllCSVFiles } from "./services/csvImporterService.js";
+import {
+  createPolizasActivasView,
+  createPolizasVencidasView,
+  createPolizasSuspendidasView,
+} from "./services/createViews.js";
+import { createIndexes } from "./config/createIndexes.js";
 import queryRoutes from "./routes/queryRoutes.js";
 import clientesRoutes from "./routes/clientesRoutes.js";
 import siniestrosRoutes from "./routes/siniestrosRoutes.js";
@@ -65,6 +71,14 @@ async function startServer() {
 
     // Import CSV files after MongoDB connection is established
     await importAllCSVFiles(DATASETS_PATH);
+
+    // Create MongoDB views
+    await createPolizasActivasView();
+    await createPolizasVencidasView();
+    await createPolizasSuspendidasView();
+
+    // Create MongoDB indexes
+    await createIndexes();
 
     app.listen(PORT, () => {
       console.log(`Server running on http://localhost:${PORT}`);
