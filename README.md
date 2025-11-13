@@ -3,7 +3,6 @@
 ## 72.41 - Bases de Datos II - Segundo Cuatrimestre 2025
 
 
-
 ### Integrantes 
 
 --------------------------------
@@ -12,12 +11,13 @@
 Para ejecutar la aplicación, se deben correr los siguientes comandos: 
 ```bash
 npm install 
-npm start [PATH_TO_CSVS_FOLDER]
+npm start [PATH] # se especifica el path a la carpeta donde se encuentran los csv de prueba
 ```
 Para que el sistema funciones correctamente debe estar corriendo el *daemon* de Docker y contar con docker-compose. 
 
+## Ejemplos de uso por consulta
 
-## Ejemplos de uso (curl)
+> __Aclaración__: Los siguientes _endpoints_ se ejemplifican utilizando la herramienta `curl` para ejemplificar tanto el url como los parámetros requeridos para cada consulta 
 
 ### Consultas 
 
@@ -122,7 +122,8 @@ Para que el sistema funciones correctamente debe estar corriendo el *daemon* de 
   curl -X DELETE http://localhost:3000/clientes/206
   ```
 
-#### Siniestros
+#### Query 14
+> __Observación:__ Se permite, además, funcionalidades adicionales a las requeridas por la consulta ( listado y búsqueda por id).
 
 - **Listar todos**
   ```
@@ -147,7 +148,8 @@ Para que el sistema funciones correctamente debe estar corriendo el *daemon* de 
     }'
   ```
 
-#### Pólizas
+#### Query 15
+> __Observación:__ Se permite, además, funcionalidades adicionales a las requeridas por la consulta ( listado y búsqueda por id).
 
 - **Listar todas**
   ```
