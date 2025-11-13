@@ -1,51 +1,27 @@
+# Trabajo Práctico Obligatorio: Sistema de Gestión de Aseguradoras
+
+## 72.41 - Bases de Datos II - Segundo Cuatrimestre 2025
+
+
+
+### Integrantes 
+
+--------------------------------
 ## Ejecución
 
-#### API Express
-
+Para ejecutar la aplicación, se deben correr los siguientes comandos: 
+```bash
+npm install 
+npm start [PATH_TO_CSVS_FOLDER]
 ```
-npm install
-npm start // inicia contenedores también
+Para que el sistema funciones correctamente debe estar corriendo el *daemon* de Docker y contar con docker-compose. 
 
-para especificar directorio de datasets:
-npm start path/to/datasets
-```
-
-#### Solo Docker-compose
-
-```
-docker-compose up -d // iniciar contenedores
-docker-compose down
-```
-
-#### Dependencias:
-
-- docker compose
-
-## Endpoints principales
-
-- Clientes (query 13):
-
-  - `GET /clientes`
-  - `GET /clientes/:id`
-  - `POST /clientes`
-  - `PUT /clientes/:id`
-  - `DELETE /clientes/:id`
-
-- Siniestros (query 14):
-
-  - `GET /siniestros`
-  - `GET /siniestros/:id`
-  - `POST /siniestros`
-
-- Pólizas (query 15):
-
-  - `GET /polizas`
-  - `GET /polizas/:nro_poliza`
-  - `POST /polizas`
 
 ## Ejemplos de uso (curl)
 
-### Consultas (queries 1-12)
+### Consultas 
+
+#### Queries 1-12
 
 - **Clientes activos con pólizas vigentes**
   ```
@@ -96,7 +72,7 @@ docker-compose down
   curl http://localhost:3000/agentes/con-siniestros
   ```            
 
-### Clientes (query 13)
+#### Query 13
 
 - **Listar todos**
   ```
@@ -146,7 +122,7 @@ docker-compose down
   curl -X DELETE http://localhost:3000/clientes/206
   ```
 
-### Siniestros
+#### Siniestros
 
 - **Listar todos**
   ```
@@ -171,7 +147,7 @@ docker-compose down
     }'
   ```
 
-### Pólizas
+#### Pólizas
 
 - **Listar todas**
   ```
