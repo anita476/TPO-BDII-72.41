@@ -17,6 +17,7 @@ const REQUIRED_FIELDS = [
   "provincia",
 ];
 
+// Given that we have a ON DELETE CASCADE with clients, more caches than usual must be invalidated.
 const CACHE_KEYS_TO_INVALIDATE = [
   "activeClientsWithPolicy:clientes-activos-polizas:v1",
   "insuredVehicles:vehiculos-asegurados:v1",
@@ -25,6 +26,10 @@ const CACHE_KEYS_TO_INVALIDATE = [
   "suspendedPolicies:polizas-suspendidas:v1",
   "clientsWithInsuredVehicles:clientes-con-multiples-vehiculos:v1",
   "agentWithAccidents:agentes-con-siniestros:v1",
+  "policiesSortedByStartDate:polizas-activas:v1",
+  "expiredPolicies:polizas-vencidas:v1",
+  "openAccidents:siniestros-abiertos:v1",
+  "activeAgents:agentes-activos-total-polizas:v1",
 ];
 
 function normalizeClientPayload(payload, { allowIdMutation = true } = {}) {

@@ -1,14 +1,14 @@
 import { getJson, setJson } from "./redisUtils.js";
 
 /**
- * Wrapper generico para implementar caché en queries
+ * Wrapper for cache implementation in queries
  *
- * @param {Object} options - Opciones de config
- * @param {string} options.cacheKey - Key única para el cache
- * @param {number} options.ttl - TTL (en segundos)
- * @param {Function} options.queryFn - Funcion async que ejecuta la query
+ * @param {Object} options - Configuration options
+ * @param {string} options.cacheKey - Unique key for the cache
+ * @param {number} options.ttl - TTL (in seconds)
+ * @param {Function} options.queryFn - Async function that executes the query
  * @param {Object} options.res - Express response object
- * @param {string} options.errorMessage - Mensaje de error personalizado
+ * @param {string} options.errorMessage - Custom error message
  *
  * @example
  * await withCache({

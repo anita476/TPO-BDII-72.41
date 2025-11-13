@@ -17,6 +17,7 @@ const VALID_ESTADOS = ["Abierto", "Cerrado", "En evaluacion"];
 const CACHE_KEYS_TO_INVALIDATE = [
   "openAccidents:siniestros-abiertos:v1",
   "agentWithAccidents:agentes-con-siniestros:v1",
+  "accidentsLastYear:siniestros-accidentes-ultimo-anio:v1",
 ];
 
 function normalizeClaimPayload(payload, { allowIdMutation = true } = {}) {

@@ -26,6 +26,9 @@ const CACHE_KEYS_TO_INVALIDATE = [
   "suspendedPolicies:polizas-suspendidas:v1",
   "clientsWithInsuredVehicles:clientes-con-multiples-vehiculos:v1",
   "agentWithAccidents:agentes-con-siniestros:v1",
+  "policiesSortedByStartDate:polizas-activas:v1",
+  "expiredPolicies:polizas-vencidas:v1",
+  "activeAgents:agentes-activos-total-polizas:v1",
 ];
 
 function normalizePolicyPayload(payload) {
