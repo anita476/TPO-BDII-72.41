@@ -16,6 +16,8 @@ import queryRoutes from "./routes/queryRoutes.js";
 import clientesRoutes from "./routes/clientesRoutes.js";
 import siniestrosRoutes from "./routes/siniestrosRoutes.js";
 import polizasRoutes from "./routes/polizasRoutes.js";
+import agenteRoutes from "./routes/agenteRoutes.js";
+import vehiculoRoutes from "./routes/vehiculoRoutes.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -56,6 +58,8 @@ app.use("/queries", queryRoutes);
 app.use("/clientes", clientesRoutes);
 app.use("/siniestros", siniestrosRoutes);
 app.use("/polizas", polizasRoutes);
+app.use("/agentes",agenteRoutes)
+app.use("/vehiculos",vehiculoRoutes)
 
 process.on("SIGINT", async () => {
   console.log("\nStopping containers...");

@@ -2,9 +2,9 @@ import { withCache } from "../utils/cacheWrapper.js";
 import { QUERY_TTL_MAP } from "../constants/cacheTTL.js";
 import siniestro from "../models/Siniestro.js";
 
-export async function query8(req, res) {
+export async function accidentsLastYear(req, res) {
   await withCache({
-    cacheKey: "query8:siniestros-accidentes-ultimo-anio:v1",
+    cacheKey: "accidentsLastYear:siniestros-accidentes-ultimo-anio:v1",
     ttl: QUERY_TTL_MAP.query8,
     queryFn: async () => {
       const now = new Date();

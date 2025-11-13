@@ -14,13 +14,13 @@ const REQUIRED_FIELDS = [
 ];
 
 const CACHE_KEYS_TO_INVALIDATE = [
-  "query1:clientes-activos-polizas:v1",
-  "query3:vehiculos-asegurados:v1",
-  "query4:clientes-sin-polizas-activas:v1",
-  "query7:top10-clientes:all-polizas:v3",
-  "query10:polizas-suspendidas:v1",
-  "query11:clientes-con-multiples-vehiculos:v1",
-  "query12:agentes-con-siniestros:v1",
+  "activeClientsWithPolicy:clientes-activos-polizas:v1",
+  "insuredVehicles:vehiculos-asegurados:v1",
+  "clientWithouthActivePolicy:clientes-sin-polizas-activas:v1",
+  "topClientsByCover:top10-clientes:all-polizas:v3",
+  "suspendedPolicies:polizas-suspendidas:v1",
+  "clientsWithInsuredVehicles:clientes-con-multiples-vehiculos:v1",
+  "agentWithAccidents:agentes-con-siniestros:v1",
 ];
 
 function normalizeClientPayload(payload, { allowIdMutation = true } = {}) {

@@ -2,9 +2,9 @@ import { withCache } from "../utils/cacheWrapper.js";
 import { QUERY_TTL_MAP } from "../constants/cacheTTL.js";
 import vehiculo from "../models/Vehiculo.js";
 
-export async function query3(req, res) {
+export async function insuredVehicles(req, res) {
   await withCache({
-    cacheKey: "query3:vehiculos-asegurados:v1",
+    cacheKey: "insuredVehicles:vehiculos-asegurados:v1",
     ttl: QUERY_TTL_MAP.query3,
     queryFn: async () => {
       const result = await vehiculo.aggregate([

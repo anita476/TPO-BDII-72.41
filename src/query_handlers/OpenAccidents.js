@@ -2,9 +2,9 @@ import { withCache } from "../utils/cacheWrapper.js";
 import { QUERY_TTL_MAP } from "../constants/cacheTTL.js";
 import siniestro from "../models/Siniestro.js";
 
-export async function query2(req, res) {
+export async function openAccidents(req, res) {
   await withCache({
-    cacheKey: "query2:siniestros-abiertos:v1",
+    cacheKey: "openAccidents:siniestros-abiertos:v1",
     ttl: QUERY_TTL_MAP.query2,
     queryFn: async () => {
       const result = await siniestro.aggregate([

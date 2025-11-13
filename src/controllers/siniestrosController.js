@@ -14,8 +14,8 @@ const VALID_TIPOS = ["Accidente", "Robo", "Danio", "Incendio"];
 const VALID_ESTADOS = ["Abierto", "Cerrado", "En evaluacion"];
 
 const CACHE_KEYS_TO_INVALIDATE = [
-  "query2:siniestros-abiertos:v1",
-  "query12:agentes-con-siniestros:v1",
+  "openAccidents:siniestros-abiertos:v1",
+  "agentWithAccidents:agentes-con-siniestros:v1",
 ];
 
 function normalizeClaimPayload(payload, { allowIdMutation = true } = {}) {

@@ -2,9 +2,9 @@ import { withCache } from "../utils/cacheWrapper.js";
 import { QUERY_TTL_MAP } from "../constants/cacheTTL.js";
 import cliente from "../models/Cliente.js";
 
-export async function query7(req, res) {
+export async function topClientsByCover(req, res) {
   await withCache({
-    cacheKey: "query7:top10-clientes:all-polizas:v3",
+    cacheKey: "topClientsByCover:top10-clientes:all-polizas:v3",
     ttl: QUERY_TTL_MAP.query7,
     queryFn: async () => {
       const pipeline = [

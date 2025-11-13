@@ -2,19 +2,19 @@ import { withCache } from "../utils/cacheWrapper.js";
 import { QUERY_TTL_MAP } from "../constants/cacheTTL.js";
 import mongoose from "mongoose";
 
-export async function query9(req, res) {
+export async function suspendedPolicies(req, res) {
   await withCache({
-    cacheKey: "query9:polizas-activas:v1",
-    ttl: QUERY_TTL_MAP.query9,
+    cacheKey: "suspendedPolicies:polizas-suspendidas:v1",
+    ttl: QUERY_TTL_MAP.query10,
     queryFn: async () => {
       const db = mongoose.connection.db;
       const result = await db
-        .collection("polizas_activas_vista")
+        .collection("polizas_suspendidas_vista")
         .find({})
         .toArray();
       return result;
     },
     res,
-    errorMessage: "No fue posible obtener las pólizas activas.",
+    errorMessage: "No fue posible obtener las pólizas suspendidas.",
   });
 }

@@ -2,9 +2,9 @@ import { withCache } from "../utils/cacheWrapper.js";
 import { QUERY_TTL_MAP } from "../constants/cacheTTL.js";
 import agente from "../models/Agente.js";
 
-export async function query12(req, res) {
+export async function agentWithAccidents(req, res) {
   await withCache({
-    cacheKey: "query12:agentes-con-siniestros:v1",
+    cacheKey: "agentWithAccidents:agentes-con-siniestros:v1",
     ttl: QUERY_TTL_MAP.query12,
     queryFn: async () => {
       const result = await agente.aggregate([

@@ -2,9 +2,9 @@ import { withCache } from "../utils/cacheWrapper.js";
 import { QUERY_TTL_MAP } from "../constants/cacheTTL.js";
 import cliente from "../models/Cliente.js";
 
-export async function query4(req, res) {
+export async function clientWithouthActivePolicy(req, res) {
   await withCache({
-    cacheKey: "query4:clientes-sin-polizas-activas:v1",
+    cacheKey: "clientWithouthActivePolicy:clientes-sin-polizas-activas:v1",
     ttl: QUERY_TTL_MAP.query4,
     queryFn: async () => {
       const result = await cliente.find({

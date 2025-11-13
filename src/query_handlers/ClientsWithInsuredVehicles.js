@@ -2,9 +2,9 @@ import { withCache } from "../utils/cacheWrapper.js";
 import { QUERY_TTL_MAP } from "../constants/cacheTTL.js";
 import cliente from "../models/Cliente.js";
 
-export async function query11(req, res) {
+export async function clientsWithInsuredVehicles(req, res) {
   await withCache({
-    cacheKey: "query11:clientes-con-multiples-vehiculos:v1",
+    cacheKey: "clientsWithInsuredVehicles:clientes-con-multiples-vehiculos:v1",
     ttl: QUERY_TTL_MAP.query11,
     queryFn: async () => {
       const result = await cliente.aggregate([
