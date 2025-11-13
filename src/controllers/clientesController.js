@@ -1,4 +1,6 @@
 import Cliente from "../models/Cliente.js";
+import Vehiculo from "../models/Vehiculo.js";
+import Siniestro from "../models/Siniestro.js";
 import { deleteKey } from "../utils/redisUtils.js";
 
 const REQUIRED_FIELDS = [
@@ -232,14 +234,31 @@ export async function deleteClient(req, res) {
   }
 
   try {
-    const result = await Cliente.findOneAndDelete({ id_cliente: clientId });
+    const client = await Cliente.findOne({ id_cliente: clientId });
 
-    if (!result) {
+    if (!client) {
       return res.status(404).json({ mensaje: "Cliente no encontrado." });
     }
 
+    const numerosPoliza = client.polizas
+      ? client.polizas.map((poliza) => poliza.nro_poliza)
+      : [];
+
+    // ON CASCADE DELETE
+    await Promise.all([
+      Vehiculo.deleteMany({ id_cliente: clientId }),
+      numerosPoliza.length > 0
+        ? Siniestro.deleteMany({ nro_poliza: { $in: numerosPoliza } })
+        : Promise.resolve(),
+    ]);
+
+    await Cliente.findOneAndDelete({ id_cliente: clientId });
+
     await invalidateClientCaches();
-    res.json({ mensaje: "Cliente eliminado correctamente." });
+    res.json({
+      mensaje:
+        "Cliente eliminado correctamente con sus pólizas, vehículos y siniestros.",
+    });
   } catch (error) {
     console.error("Error al eliminar cliente:", error);
     res.status(500).json({ mensaje: "No fue posible eliminar el cliente." });
