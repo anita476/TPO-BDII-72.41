@@ -1,6 +1,3 @@
-/**
- * HTTP Status Codes
- */
 export const HTTP_STATUS = {
   OK: 200,
   CREATED: 201,
@@ -10,9 +7,6 @@ export const HTTP_STATUS = {
   INTERNAL_SERVER_ERROR: 500,
 };
 
-/**
- * Simple custom error with status code
- */
 export class HttpError extends Error {
   constructor(message, statusCode = HTTP_STATUS.INTERNAL_SERVER_ERROR) {
     super(message);
@@ -20,7 +14,11 @@ export class HttpError extends Error {
   }
 }
 
-export function handleError(error, res, defaultMessage = "Error interno del servidor.") {
+export function handleError(
+  error,
+  res,
+  defaultMessage = "Error interno del servidor."
+) {
   console.error("Error:", error);
 
   if (error instanceof HttpError) {
@@ -36,5 +34,7 @@ export function handleError(error, res, defaultMessage = "Error interno del serv
   }
 
   // Unknown errors
-  return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ mensaje: defaultMessage });
+  return res
+    .status(HTTP_STATUS.INTERNAL_SERVER_ERROR)
+    .json({ mensaje: defaultMessage });
 }

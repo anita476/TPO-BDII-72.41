@@ -41,6 +41,7 @@ export async function agentWithAccidents(req, res) {
       return result;
     },
     res,
-    errorMessage: "No fue posible obtener la cantidad de siniestros por agente.",
+    errorMessage:
+      "No fue posible obtener la cantidad de siniestros por agente.",
   });
 }

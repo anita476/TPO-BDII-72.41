@@ -1,5 +1,3 @@
-// we can use the models to simplify collection creation and then call abm on models more easily !
-// https://mongoosejs.com/docs/models.html
 import mongoose from "mongoose";
 
 const polizaSchema = new mongoose.Schema({

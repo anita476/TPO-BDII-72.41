@@ -45,6 +45,7 @@ export async function clientsWithInsuredVehicles(req, res) {
       return result;
     },
     res,
-    errorMessage: "No fue posible obtener los clientes con múltiples vehículos.",
+    errorMessage:
+      "No fue posible obtener los clientes con múltiples vehículos.",
   });
 }

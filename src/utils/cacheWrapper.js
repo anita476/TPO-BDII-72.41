@@ -1,7 +1,7 @@
 import { getJson, setJson } from "./redisUtils.js";
 
 /**
- * Wrapper generico para implementar cache en queries
+ * Wrapper generico para implementar caché en queries
  *
  * @param {Object} options - Opciones de config
  * @param {string} options.cacheKey - Key única para el cache

@@ -7,10 +7,14 @@ export async function createPolizasActivasView() {
   try {
     const db = mongoose.connection.db;
 
-    const collections = await db.listCollections({ name: "polizas_activas_vista" }).toArray();
+    const collections = await db
+      .listCollections({ name: "polizas_activas_vista" })
+      .toArray();
 
     if (collections.length > 0) {
-      console.log("Vista 'polizas_activas_vista' ya existe, eliminándola para recrearla...");
+      console.log(
+        "Vista 'polizas_activas_vista' ya existe, eliminándola para recrearla..."
+      );
       await db.dropCollection("polizas_activas_vista");
     }
 
@@ -29,17 +33,26 @@ export async function createPolizasActivasView() {
               $dateFromParts: {
                 year: {
                   $toInt: {
-                    $arrayElemAt: [{ $split: ["$polizas.fecha_inicio", "/"] }, 2],
+                    $arrayElemAt: [
+                      { $split: ["$polizas.fecha_inicio", "/"] },
+                      2,
+                    ],
                   },
                 },
                 month: {
                   $toInt: {
-                    $arrayElemAt: [{ $split: ["$polizas.fecha_inicio", "/"] }, 1],
+                    $arrayElemAt: [
+                      { $split: ["$polizas.fecha_inicio", "/"] },
+                      1,
+                    ],
                   },
                 },
                 day: {
                   $toInt: {
-                    $arrayElemAt: [{ $split: ["$polizas.fecha_inicio", "/"] }, 0],
+                    $arrayElemAt: [
+                      { $split: ["$polizas.fecha_inicio", "/"] },
+                      0,
+                    ],
                   },
                 },
               },

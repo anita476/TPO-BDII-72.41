@@ -136,7 +136,9 @@ export async function getClient(req, res) {
     const client = await Cliente.findOne({ id_cliente: clientId });
 
     if (!client) {
-      return res.status(HTTP_STATUS.NOT_FOUND).json({ mensaje: "Cliente no encontrado." });
+      return res
+        .status(HTTP_STATUS.NOT_FOUND)
+        .json({ mensaje: "Cliente no encontrado." });
     }
 
     res.json(client);
@@ -155,7 +157,9 @@ export async function createClient(req, res) {
   });
 
   if (errors.length > 0) {
-    return res.status(HTTP_STATUS.BAD_REQUEST).json({ mensaje: errors.join(" ") });
+    return res
+      .status(HTTP_STATUS.BAD_REQUEST)
+      .json({ mensaje: errors.join(" ") });
   }
 
   for (const field of REQUIRED_FIELDS) {
@@ -182,7 +186,9 @@ export async function createClient(req, res) {
     res.status(HTTP_STATUS.CREATED).json(newClient);
   } catch (error) {
     console.error("Error al crear cliente:", error);
-    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ mensaje: "No fue posible crear el cliente." });
+    res
+      .status(HTTP_STATUS.INTERNAL_SERVER_ERROR)
+      .json({ mensaje: "No fue posible crear el cliente." });
   }
 }
 
@@ -202,7 +208,9 @@ export async function updateClient(req, res) {
   });
 
   if (errors.length > 0) {
-    return res.status(HTTP_STATUS.BAD_REQUEST).json({ mensaje: errors.join(" ") });
+    return res
+      .status(HTTP_STATUS.BAD_REQUEST)
+      .json({ mensaje: errors.join(" ") });
   }
 
   try {
@@ -213,14 +221,18 @@ export async function updateClient(req, res) {
     );
 
     if (!updatedClient) {
-      return res.status(HTTP_STATUS.NOT_FOUND).json({ mensaje: "Cliente no encontrado." });
+      return res
+        .status(HTTP_STATUS.NOT_FOUND)
+        .json({ mensaje: "Cliente no encontrado." });
     }
 
     await invalidateClientCaches();
     res.json(updatedClient);
   } catch (error) {
     console.error("Error al actualizar cliente:", error);
-    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ mensaje: "No fue posible actualizar el cliente." });
+    res
+      .status(HTTP_STATUS.INTERNAL_SERVER_ERROR)
+      .json({ mensaje: "No fue posible actualizar el cliente." });
   }
 }
 
@@ -239,7 +251,6 @@ export async function deleteClient(req, res) {
 
   try {
     const result = await session.withTransaction(async () => {
-      // 1. Obtener cliente dentro de transacción
       const client = await Cliente.findOne({ id_cliente: clientId }).session(
         session
       );
@@ -252,7 +263,6 @@ export async function deleteClient(req, res) {
         ? client.polizas.map((poliza) => poliza.nro_poliza)
         : [];
 
-      // 2. Eliminar en cascada (todo dentro de la transacción)
       await Vehiculo.deleteMany({ id_cliente: clientId }, { session });
 
       if (numerosPoliza.length > 0) {
@@ -267,7 +277,6 @@ export async function deleteClient(req, res) {
       return client;
     });
 
-    // 3. Invalidar caches DESPUÉS de commit exitoso
     await invalidateClientCaches();
 
     res.json({

@@ -58,8 +58,8 @@ app.use("/queries", queryRoutes);
 app.use("/clientes", clientesRoutes);
 app.use("/siniestros", siniestrosRoutes);
 app.use("/polizas", polizasRoutes);
-app.use("/agentes",agenteRoutes)
-app.use("/vehiculos",vehiculoRoutes)
+app.use("/agentes", agenteRoutes);
+app.use("/vehiculos", vehiculoRoutes);
 
 process.on("SIGINT", async () => {
   console.log("\nStopping containers and removing volumes...");
@@ -67,7 +67,7 @@ process.on("SIGINT", async () => {
     await compose.down({
       cwd: path.resolve(__dirname, "../"),
       log: true,
-      commandOptions: ["-v", "--remove-orphans"],              // removes volumes
+      commandOptions: ["-v", "--remove-orphans"], // removes volumes
     });
     console.log("Containers and volumes removed successfully.");
   } catch (err) {

@@ -42,6 +42,7 @@ export async function activeAgents(req, res) {
       return result;
     },
     res,
-    errorMessage: "No fue posible obtener los agentes activos con total de pólizas.",
+    errorMessage:
+      "No fue posible obtener los agentes activos con total de pólizas.",
   });
 }
