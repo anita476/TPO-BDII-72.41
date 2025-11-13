@@ -123,7 +123,7 @@ async function invalidatePolicyCaches() {
   await Promise.all(CACHE_KEYS_TO_INVALIDATE.map((key) => deleteKey(key)));
 }
 
-// GET /polizas -> listado completo de pólizas
+// GET /polizas -> complete list of policies
 export async function listPolicy(req, res) {
   try {
     const clientes = await Cliente.find({}, "id_cliente polizas");
@@ -149,7 +149,7 @@ export async function listPolicy(req, res) {
   }
 }
 
-// GET /polizas/:nro_poliza -> retorna una póliza por su id
+// GET /polizas/:nro_poliza -> returns a policy by its id
 export async function getPolicy(req, res) {
   const { id } = req.params;
   const nroPoliza = String(id).trim();
@@ -166,13 +166,17 @@ export async function getPolicy(req, res) {
     });
 
     if (!cliente) {
-      return res.status(HTTP_STATUS.NOT_FOUND).json({ mensaje: "Póliza no encontrada." });
+      return res
+        .status(HTTP_STATUS.NOT_FOUND)
+        .json({ mensaje: "Póliza no encontrada." });
     }
 
     const poliza = cliente.polizas.find((p) => p.nro_poliza === nroPoliza);
 
     if (!poliza) {
-      return res.status(HTTP_STATUS.NOT_FOUND).json({ mensaje: "Póliza no encontrada." });
+      return res
+        .status(HTTP_STATUS.NOT_FOUND)
+        .json({ mensaje: "Póliza no encontrada." });
     }
 
     res.json({
@@ -187,12 +191,14 @@ export async function getPolicy(req, res) {
   }
 }
 
-// POST /polizas -> emisión de una nueva póliza
+// POST /polizas -> issue a new policy
 export async function createPolicy(req, res) {
   const { parsed: payload, errors } = normalizePolicyPayload(req.body);
 
   if (errors.length > 0) {
-    return res.status(HTTP_STATUS.BAD_REQUEST).json({ mensaje: errors.join(" ") });
+    return res
+      .status(HTTP_STATUS.BAD_REQUEST)
+      .json({ mensaje: errors.join(" ") });
   }
 
   for (const field of REQUIRED_FIELDS) {
@@ -214,7 +220,7 @@ export async function createPolicy(req, res) {
 
   try {
     const result = await session.withTransaction(async () => {
-      // 1. Verificar cliente existe
+      // 1. Verify client exists
       const cliente = await Cliente.findOne({ id_cliente: idCliente }).session(
         session
       );
@@ -223,7 +229,7 @@ export async function createPolicy(req, res) {
         throw new HttpError("Cliente no encontrado.", HTTP_STATUS.NOT_FOUND);
       }
 
-      // 2. Verificar agente existe y está activo
+      // 2. Verify agent exists and is active
       const agente = await Agente.findOne({
         id_agente: payload.id_agente,
       }).session(session);
@@ -233,19 +239,25 @@ export async function createPolicy(req, res) {
       }
 
       if (!agente.activo) {
-        throw new HttpError("El agente no está activo.", HTTP_STATUS.BAD_REQUEST);
+        throw new HttpError(
+          "El agente no está activo.",
+          HTTP_STATUS.BAD_REQUEST
+        );
       }
 
-      // 3. Verificar que póliza no existe
+      // 3. Verify policy doesn't exist
       const existingPoliza = await Cliente.findOne({
         "polizas.nro_poliza": payload.nro_poliza,
       }).session(session);
 
       if (existingPoliza) {
-        throw new HttpError("Ya existe una póliza con ese número.", HTTP_STATUS.CONFLICT);
+        throw new HttpError(
+          "Ya existe una póliza con ese número.",
+          HTTP_STATUS.CONFLICT
+        );
       }
 
-      // 4. Crear póliza
+      // 4. Create policy
       const nuevaPoliza = {
         ...payload,
         id_cliente: idCliente,
@@ -267,7 +279,7 @@ export async function createPolicy(req, res) {
       };
     });
 
-    // 5. Invalidar caches DESPUÉS de commit exitoso
+    // 5. Invalidate caches AFTER successful commit
     await invalidatePolicyCaches();
 
     res.status(HTTP_STATUS.CREATED).json(result);

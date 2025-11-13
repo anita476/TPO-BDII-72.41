@@ -93,7 +93,6 @@ async function importCSVFile(filePath, fileName, Model) {
     });
 
     // Insert all records
-    //TODO add insertion order
     console.log("RECORDS ", transformedRecords.length);
     const result = await Model.insertMany(transformedRecords, {
       ordered: false,

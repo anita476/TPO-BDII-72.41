@@ -7,9 +7,8 @@
  * - SEMI_STATIC: Data that changes occasionally (vehiculos, suspensiones)
  * - ANALYTIC: Reports and historical data
  *
- * Review section X of the report (in docs/informe) for detailed justification
+ * Review section 5 of the report (in docs/informe) for detailed justification
  */
-//TODO: complete with real seccion del informe una vez q este terminado
 
 export const CACHE_TTL = {
   TRANSACTIONAL: 120,

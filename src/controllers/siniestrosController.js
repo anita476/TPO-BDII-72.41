@@ -95,7 +95,7 @@ async function invalidateClaimCaches() {
   await Promise.all(CACHE_KEYS_TO_INVALIDATE.map((key) => deleteKey(key)));
 }
 
-// GET /siniestros -> listado completo de siniestros
+// GET /siniestros -> complete list of claims
 export async function listClaims(req, res) {
   try {
     const claims = await Siniestro.find({});
@@ -108,7 +108,7 @@ export async function listClaims(req, res) {
   }
 }
 
-// GET /siniestros/:id -> retorna un siniestro por su id
+// GET /siniestros/:id -> returns a claim by its id
 export async function getClaim(req, res) {
   const { id } = req.params;
   const claimId = Number(id);
@@ -123,7 +123,9 @@ export async function getClaim(req, res) {
     const claim = await Siniestro.findOne({ id_siniestro: claimId });
 
     if (!claim) {
-      return res.status(HTTP_STATUS.NOT_FOUND).json({ mensaje: "Siniestro no encontrado." });
+      return res
+        .status(HTTP_STATUS.NOT_FOUND)
+        .json({ mensaje: "Siniestro no encontrado." });
     }
 
     res.json(claim);
@@ -135,14 +137,16 @@ export async function getClaim(req, res) {
   }
 }
 
-// POST /siniestros -> alta de un nuevo siniestro
+// POST /siniestros -> create a new claim
 export async function createClaim(req, res) {
   const { parsed: payload, errors } = normalizeClaimPayload(req.body, {
     allowIdMutation: true,
   });
 
   if (errors.length > 0) {
-    return res.status(HTTP_STATUS.BAD_REQUEST).json({ mensaje: errors.join(" ") });
+    return res
+      .status(HTTP_STATUS.BAD_REQUEST)
+      .json({ mensaje: errors.join(" ") });
   }
 
   for (const field of REQUIRED_FIELDS) {
@@ -169,6 +173,8 @@ export async function createClaim(req, res) {
     res.status(HTTP_STATUS.CREATED).json(newClaim);
   } catch (error) {
     console.error("Error al crear siniestro:", error);
-    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ mensaje: "No fue posible crear el siniestro." });
+    res
+      .status(HTTP_STATUS.INTERNAL_SERVER_ERROR)
+      .json({ mensaje: "No fue posible crear el siniestro." });
   }
 }

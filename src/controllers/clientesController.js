@@ -108,7 +108,7 @@ async function invalidateClientCaches() {
   await Promise.all(CACHE_KEYS_TO_INVALIDATE.map((key) => deleteKey(key)));
 }
 
-// GET /clientes -> listado completo de clientes
+// GET /clientes -> complete list of clients
 export async function listClients(req, res) {
   try {
     const clients = await Cliente.find({});
@@ -121,7 +121,7 @@ export async function listClients(req, res) {
   }
 }
 
-// GET /clientes/:id -> retorna un cliente por su id
+// GET /clientes/:id -> returns a client by its id
 export async function getClient(req, res) {
   const { id } = req.params;
   const clientId = Number(id);
@@ -150,7 +150,7 @@ export async function getClient(req, res) {
   }
 }
 
-// POST /clientes -> alta de un nuevo cliente
+// POST /clientes -> create a new client
 export async function createClient(req, res) {
   const { parsed: payload, errors } = normalizeClientPayload(req.body, {
     allowIdMutation: true,
@@ -192,7 +192,7 @@ export async function createClient(req, res) {
   }
 }
 
-// PUT /clientes/:id -> actualización de un cliente existente
+// PUT /clientes/:id -> update an existing client
 export async function updateClient(req, res) {
   const { id } = req.params;
   const clientId = Number(id);
@@ -236,7 +236,7 @@ export async function updateClient(req, res) {
   }
 }
 
-// DELETE /clientes/:id -> elimina un cliente
+// DELETE /clientes/:id -> delete a client
 export async function deleteClient(req, res) {
   const { id } = req.params;
   const clientId = Number(id);

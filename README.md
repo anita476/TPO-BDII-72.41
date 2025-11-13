@@ -9,21 +9,24 @@
 - Juan Oliva - 64105
 - Matías Leporini - 62872
 
---------------------------------
+---
+
 ## Ejecución
 
-Para ejecutar la aplicación, se deben correr los siguientes comandos: 
+Para ejecutar la aplicación, se deben correr los siguientes comandos:
+
 ```bash
-npm install 
+npm install
 npm start [PATH] # se especifica el path a la carpeta donde se encuentran los csv de prueba
 ```
-Para que el sistema funciones correctamente debe estar corriendo el *daemon* de Docker y contar con docker-compose. 
+
+Para que el sistema funciones correctamente debe estar corriendo el _daemon_ de Docker y contar con docker-compose.
 
 ## Ejemplos de uso por consulta
 
-> __Aclaración__: Los siguientes _endpoints_ se ejemplifican utilizando la herramienta `curl` para ejemplificar tanto el url como los parámetros requeridos para cada consulta 
+> **Aclaración**: Los siguientes _endpoints_ se ejemplifican utilizando la herramienta `curl` para ejemplificar tanto el url como los parámetros requeridos para cada consulta
 
-### Consultas 
+### Consultas
 
 #### Queries 1-12
 
@@ -74,7 +77,7 @@ Para que el sistema funciones correctamente debe estar corriendo el *daemon* de 
 - **Agentes y cantidad de siniestros asociados**
   ```
   curl http://localhost:3000/agentes/con-siniestros
-  ```            
+  ```
 
 #### Query 13
 
@@ -127,7 +130,8 @@ Para que el sistema funciones correctamente debe estar corriendo el *daemon* de 
   ```
 
 #### Query 14
-> __Observación:__ Se permite, además, funcionalidades adicionales a las requeridas por la consulta ( listado y búsqueda por id).
+
+> **Observación:** Se permite, además, funcionalidades adicionales a las requeridas por la consulta (listado y búsqueda por id).
 
 - **Listar todos**
   ```
@@ -153,7 +157,8 @@ Para que el sistema funciones correctamente debe estar corriendo el *daemon* de 
   ```
 
 #### Query 15
-> __Observación:__ Se permite, además, funcionalidades adicionales a las requeridas por la consulta ( listado y búsqueda por id).
+
+> **Observación:** Se permite, además, funcionalidades adicionales a las requeridas por la consulta ( listado y búsqueda por id).
 
 - **Listar todas**
   ```
