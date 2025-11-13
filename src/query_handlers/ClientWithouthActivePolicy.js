@@ -1,9 +1,9 @@
 import { getJson, setJson } from "../utils/redisUtils.js";
 import cliente from "../models/Cliente.js";
 
-export async function query4(req, res) {
+export async function clientWithouthActivePolicy(req, res) {
   try {
-    const cacheKey = "query4:clientes-sin-polizas-activas:v1";
+    const cacheKey = "clientWithouthActivePolicy:clientes-sin-polizas-activas:v1";
     const cacheTtlSeconds = 600;
 
     const cache = await getJson(cacheKey);
@@ -24,7 +24,7 @@ export async function query4(req, res) {
     await setJson(cacheKey, resp, cacheTtlSeconds);
     res.json(resp);
   } catch (error) {
-    console.error("Error en query4:", error);
+    console.error("Error en clientWithouthActivePolicy:", error);
     res.status(500).json({
       mensaje: "No fue posible obtener los clientes sin pólizas activas.",
     });

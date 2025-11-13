@@ -3,7 +3,7 @@ import vehiculo from "../models/Vehiculo.js";
 
 
 //NO ANDA
-export async function query8(req,res) {
+export async function accidentsLastYear(req, res) {
     const now = new Date();
     const lastYearStart = new Date(now.getFullYear() - 1, 0, 1);
     const lastYearEnd = new Date(now.getFullYear(), 0, 1);

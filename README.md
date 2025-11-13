@@ -49,24 +49,52 @@ docker-compose down
 
 - **Clientes activos con pólizas vigentes**
   ```
-  curl http://localhost:3000/queries/query1
+  curl http://localhost:3000/clientes/activos
   ```
 - **Siniestros abiertos con datos del cliente**
   ```
-  curl http://localhost:3000/queries/query2
+  curl http://localhost:3000/siniestros/open
   ```
 - **Vehículos asegurados y su cliente**
   ```
-  curl http://localhost:3000/queries/query3
+  curl http://localhost:3000/vehiculos/asegurados
   ```
 - **Clientes sin pólizas activas**
   ```
-  curl http://localhost:3000/queries/query4
+  curl http://localhost:3000/clientes/sin-poliza-activa
+  ```
+- **Agentes activos con cantidad de pólizas asignadas**
+  ```
+  curl http://localhost:3000/agentes/activos
+  ```
+- **Pólizas vencidas con el nombre del cliente**
+  ```
+  curl http://localhost:3000/polizas/vencidas
   ```
 - **Top 10 clientes por cobertura**
   ```
-  curl http://localhost:3000/queries/query7
+  curl http://localhost:3000/clientes/top-por-cobertura
   ```
+- **Siniestros tipo “Accidente” del último año**
+  ```
+  curl http://localhost:3000/siniestros/accidente-ultimo-anio
+  ```
+- **Vista de pólizas activas ordenadas por fecha de inicio**
+  ```
+  curl http://localhost:3000/polizas/ordenadas-por-fecha-inicio
+  ```
+- **Pólizas suspendidas con estado del cliente**
+  ```
+  curl http://localhost:3000/polizas/suspendidas
+  ```
+- **Clientes con más de un vehículo asegurado**
+  ```
+  curl http://localhost:3000/clientes/con-vehiculos-asegurados
+  ```
+- **Agentes y cantidad de siniestros asociados**
+  ```
+  curl http://localhost:3000/agentes/con-siniestros
+  ```            
 
 ### Clientes (query 13)
 

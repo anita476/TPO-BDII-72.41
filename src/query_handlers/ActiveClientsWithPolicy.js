@@ -1,9 +1,9 @@
 import { getJson, setJson } from "../utils/redisUtils.js";
 import cliente from "../models/Cliente.js";
 
-export async function query1(req, res) {
+export async function activeClientsWithPolicy(req, res) {
   try {
-    const cacheKey = "query1:clientes-activos-polizas:v1";
+    const cacheKey = "activeClientsWithPolicy:clientes-activos-polizas:v1";
     const cacheTtlSeconds = 450;
 
     const cache = await getJson(cacheKey);
@@ -44,7 +44,7 @@ export async function query1(req, res) {
     await setJson(cacheKey, resp, cacheTtlSeconds);
     res.json(resp);
   } catch (error) {
-    console.error("Error en query1:", error);
+    console.error("Error en activeClientsWithPolicy:", error);
     res
       .status(500)
       .json({ mensaje: "No fue posible obtener los clientes activos." });

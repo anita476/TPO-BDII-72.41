@@ -1,9 +1,9 @@
 import { getJson, setJson } from "../utils/redisUtils.js";
 import vehiculo from "../models/Vehiculo.js";
 
-export async function query3(req, res) {
+export async function insuredVehicles(req, res) {
   try {
-    const cacheKey = "query3:vehiculos-asegurados:v1";
+    const cacheKey = "insuredVehicles:vehiculos-asegurados:v1";
     const cacheTtlSeconds = 600;
 
     const cache = await getJson(cacheKey);
@@ -28,7 +28,7 @@ export async function query3(req, res) {
     await setJson(cacheKey, resp, cacheTtlSeconds);
     res.json(resp);
   } catch (error) {
-    console.error("Error en query3:", error);
+    console.error("Error en insuredVehicles:", error);
     res.status(500).json({
       mensaje: "No fue posible obtener los vehículos asegurados.",
     });

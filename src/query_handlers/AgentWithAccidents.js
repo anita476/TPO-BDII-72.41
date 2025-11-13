@@ -1,9 +1,9 @@
 import { getJson, setJson } from "../utils/redisUtils.js";
 import agente from "../models/Agente.js";
 
-export async function query12(req, res) {
+export async function agentWithAccidents(req, res) {
   try {
-    const cacheKey = "query12:agentes-con-siniestros:v1";
+    const cacheKey = "agentWithAccidents:agentes-con-siniestros:v1";
     const cacheTtlSeconds = 300;
 
     const cache = await getJson(cacheKey);
@@ -46,7 +46,7 @@ export async function query12(req, res) {
     await setJson(cacheKey, resp, cacheTtlSeconds);
     res.json(resp);
   } catch (error) {
-    console.error("Error en query12:", error);
+    console.error("Error en agentWithAccidents:", error);
     res.status(500).json({
       mensaje: "No fue posible obtener la cantidad de siniestros por agente.",
     });

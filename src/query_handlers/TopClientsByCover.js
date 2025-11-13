@@ -3,9 +3,9 @@ import cliente from "../models/Cliente.js";
 
 // El top 10 cambia poco, por lo que tiene sentido cachearlo
 
-export async function query7(req, res) {
+export async function topClientsByCover(req, res) {
   try {
-    const cacheKey = "query7:top10-clientes:all-polizas:v3";
+    const cacheKey = "topClientsByCover:top10-clientes:all-polizas:v3";
     const cacheTtlSeconds = 600;
 
     const cache = await getJson(cacheKey);
@@ -61,7 +61,7 @@ export async function query7(req, res) {
     await setJson(cacheKey, respuesta, cacheTtlSeconds);
     res.json(respuesta);
   } catch (error) {
-    console.error("Error en query7:", error);
+    console.error("Error en topClientsByCover:", error);
     res.status(500).json({
       mensaje: "No fue posible obtener el top 10 de clientes por cobertura.",
     });

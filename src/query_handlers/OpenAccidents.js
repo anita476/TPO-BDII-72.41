@@ -1,9 +1,9 @@
 import { getJson, setJson } from "../utils/redisUtils.js";
 import siniestro from "../models/Siniestro.js";
 
-export async function query2(req, res) {
+export async function openAccidents(req, res) {
   try {
-    const cacheKey = "query2:siniestros-abiertos:v1";
+    const cacheKey = "openAccidents:siniestros-abiertos:v1";
     const cacheTtlSeconds = 300;
 
     const cache = await getJson(cacheKey);
@@ -46,7 +46,7 @@ export async function query2(req, res) {
     await setJson(cacheKey, resp, cacheTtlSeconds);
     res.json(resp);
   } catch (error) {
-    console.error("Error en query2:", error);
+    console.error("Error en openAccidents:", error);
     res.status(500).json({
       mensaje: "No fue posible obtener los siniestros abiertos.",
     });

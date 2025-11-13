@@ -4,7 +4,7 @@ import cliente from "../models/Cliente.js";
 
 
 
-export async function query9(req,res) {
+export async function policiesSortedByStartDate(req, res) {
     const cli = cliente.aggregate([
         {
             $unwind: "$polizas"

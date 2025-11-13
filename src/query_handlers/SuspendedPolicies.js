@@ -1,9 +1,9 @@
 import { getJson, setJson } from "../utils/redisUtils.js";
 import cliente from "../models/Cliente.js";
 
-export async function query6(req, res) {
+export async function suspendedPolicies(req, res) {
   try {
-    const cacheKey = "query6:clientes-polizas-vencidas:v1";
+    const cacheKey = "suspendedPolicies:polizas-suspendidas:v1";
     const cacheTtlSeconds = 300;
 
     const cache = await getJson(cacheKey);
@@ -12,14 +12,14 @@ export async function query6(req, res) {
     }
 
     const cli = cliente.aggregate([
+      { $unwind: "$polizas" },
       {
-        $unwind: "$polizas",
+        $match: { "polizas.estado": "Suspendida" },
       },
-      { $match: { "polizas.estado": "Vencida" } },
       {
         $project: {
+          estadoCliente: "$activo",
           polizas: 1,
-          nombre: 1,
         },
       },
     ]);
@@ -27,9 +27,9 @@ export async function query6(req, res) {
     await setJson(cacheKey, resp, cacheTtlSeconds);
     res.json(resp);
   } catch (error) {
-    console.error("Error en query6:", error);
+    console.error("Error en suspendedPolicies:", error);
     res.status(500).json({
-      mensaje: "No fue posible obtener los clientes con pólizas vencidas.",
+      mensaje: "No fue posible obtener las pólizas suspendidas.",
     });
   }
 }

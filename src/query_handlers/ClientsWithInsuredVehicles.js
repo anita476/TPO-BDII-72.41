@@ -1,9 +1,9 @@
 import { getJson, setJson } from "../utils/redisUtils.js";
 import cliente from "../models/Cliente.js";
 
-export async function query11(req, res) {
+export async function clientsWithInsuredVehicles(req, res) {
   try {
-    const cacheKey = "query11:clientes-con-multiples-vehiculos:v1";
+    const cacheKey = "clientsWithInsuredVehicles:clientes-con-multiples-vehiculos:v1";
     const cacheTtlSeconds = 600;
 
     const cache = await getJson(cacheKey);
@@ -50,7 +50,7 @@ export async function query11(req, res) {
     await setJson(cacheKey, resp, cacheTtlSeconds);
     res.json(resp);
   } catch (error) {
-    console.error("Error en query11:", error);
+    console.error("Error en clientsWithInsuredVehicles:", error);
     res.status(500).json({
       mensaje: "No fue posible obtener los clientes con múltiples vehículos.",
     });
