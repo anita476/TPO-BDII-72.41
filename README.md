@@ -2,8 +2,12 @@
 
 ## 72.41 - Bases de Datos II - Segundo Cuatrimestre 2025
 
+### Integrantes
 
-### Integrantes 
+- Ana Negre - 63074
+- Camila Lee - 63382
+- Juan Oliva - 64105
+- Matías Leporini - 62872
 
 --------------------------------
 ## Ejecución
