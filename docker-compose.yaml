@@ -4,6 +4,8 @@ services:
     image: mongo:7
     ports:
       - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
 
   redis:
     image: redis:latest
@@ -13,3 +15,8 @@ services:
     environment:
       REDIS_PASSWORD: redisgrupo8
     command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+volumes:
+  mongo_data:
+  redis_data:

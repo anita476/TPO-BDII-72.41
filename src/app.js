@@ -62,9 +62,19 @@ app.use("/agentes",agenteRoutes)
 app.use("/vehiculos",vehiculoRoutes)
 
 process.on("SIGINT", async () => {
-  console.log("\nStopping containers...");
-  await compose.down({ cwd: __dirname });
-  process.exit(0);
+  console.log("\nStopping containers and removing volumes...");
+  try {
+    await compose.down({
+      cwd: path.resolve(__dirname, "../"),
+      log: true,
+      commandOptions: ["-v", "--remove-orphans"],              // removes volumes
+    });
+    console.log("Containers and volumes removed successfully.");
+  } catch (err) {
+    console.error("Error stopping containers:", err);
+  } finally {
+    process.exit(0);
+  }
 });
 
 /*************HELPERS **********/
@@ -96,7 +106,11 @@ async function startServer() {
 async function startContainers() {
   console.log("Starting containers...");
   try {
-    await compose.upAll({ cwd: path.resolve(__dirname, "../"), log: true });
+    await compose.upMany(["mongodb", "redis"], {
+      cwd: path.resolve(__dirname, "../"),
+      log: true,
+      commandOptions: ["--no-recreate"],
+    });
     console.log("All containers started");
   } catch (err) {
     console.error("Error starting containers:", err);
