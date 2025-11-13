@@ -53,12 +53,12 @@ async function readCSV(filePath) {
  */
 async function importCSVFile(filePath, fileName, Model) {
   try {
-    console.log(`\nImporting ${fileName}...`);
+    console.log(`\nImportando ${fileName}...`);
 
     const records = await readCSV(filePath);
 
     if (records.length === 0) {
-      console.log(`${fileName} is empty, skipping...`);
+      console.log(`${fileName} está vacío, saltando...`);
       return;
     }
 
@@ -67,7 +67,7 @@ async function importCSVFile(filePath, fileName, Model) {
     try {
       await Model.collection.dropIndexes();
     } catch (indexError) {
-      console.log("Could not drop indexes:", indexError.message);
+      console.log("No se pudieron eliminar los índices:", indexError.message);
     }
 
     // Transform records to match schema types
@@ -97,12 +97,12 @@ async function importCSVFile(filePath, fileName, Model) {
     const result = await Model.insertMany(transformedRecords, {
       ordered: false,
     });
-    console.log(`Imported ${result.length} records from ${fileName}`);
+    console.log(`Se importaron ${result.length} records desde ${fileName}`);
   } catch (error) {
     if (error.code === 11000) {
-      console.log(`Some duplicate records skipped in ${fileName}`);
+      console.log(`Algunos records duplicados saltados en ${fileName}`);
     } else {
-      console.error(`Error importing ${fileName}:`, error.message);
+      console.error(`Error al importar ${fileName}:`, error.message);
     }
   }
 }
@@ -116,22 +116,28 @@ async function importAllCSVFiles(customPath) {
     // Use custom path if provided, otherwise use default
     const datasetsPath = customPath ? path.resolve(customPath) : null;
     if (!datasetsPath || !fs.existsSync(datasetsPath)) {
-      console.log("Datasets directory not found. Skipping CSV import.");
+      console.log(
+        "Directorio de datasets no encontrado. Saltando importación de CSVs."
+      );
       return;
     }
-    console.log("\nStarting CSV import from:", datasetsPath);
+    console.log("\nIniciando importación de CSVs desde:", datasetsPath);
 
     // Read all files in the directory
     const files = fs.readdirSync(datasetsPath);
     const csvFiles = files.filter((file) => file.endsWith(".csv"));
 
     if (csvFiles.length === 0) {
-      console.log("No CSV files found in Datasets directory");
+      console.log(
+        "No se encontraron archivos CSV en el directorio de datasets"
+      );
       return;
     }
 
     console.log(
-      `Found ${csvFiles.length} CSV file(s): ${csvFiles.join(", ")}\n`
+      `Se encontraron ${csvFiles.length} archivo(s) CSV: ${csvFiles.join(
+        ", "
+      )}\n`
     );
 
     // Import clientes
@@ -160,27 +166,29 @@ async function importAllCSVFiles(customPath) {
 
       const Model = MODEL_MAPPING[fileName.toLowerCase()];
       if (!Model) {
-        console.log(`No model mapping found for ${fileName}, skipping...`);
+        console.log(
+          `No se encontró el model mapping para ${fileName}, saltando...`
+        );
         continue;
       }
 
       await importCSVFile(path.join(datasetsPath, fileName), fileName, Model);
     }
 
-    console.log("\nCSV import completed!\n");
+    console.log("\nImportación de CSV completada!\n");
   } catch (error) {
-    console.error("Error during CSV import:", error);
+    console.error("Error al importar CSV:", error);
   }
 }
 
 async function importPolizasEmbedded(filePath) {
   try {
-    console.log(`\nImporting polizas.csv as embedded documents...`);
+    console.log(`\nImportando polizas.csv como documentos embebidos...`);
 
     const records = await readCSV(filePath);
 
     if (records.length === 0) {
-      console.log(`polizas.csv is empty, skipping...`);
+      console.log(`polizas.csv está vacío, saltando...`);
       return;
     }
 
@@ -199,9 +207,9 @@ async function importPolizasEmbedded(filePath) {
       }
     }
 
-    console.log(`Embedded ${updatedCount} polizas into clientes`);
+    console.log(`Se embedieron ${updatedCount} polizas en clientes`);
   } catch (error) {
-    console.error(`Error importing polizas:`, error.message);
+    console.error(`Error al importar polizas:`, error.message);
   }
 }
 

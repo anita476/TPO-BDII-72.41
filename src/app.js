@@ -32,7 +32,7 @@ startContainers(); // auto-start containers
 startServer();
 
 app.get("/", (req, res) => {
-  res.send("Containers are up and Express is running!");
+  res.send("Contenedores inicializados y Express en ejecución!");
 });
 
 // to check if the db are still connected ....
@@ -62,16 +62,16 @@ app.use("/agentes", agenteRoutes);
 app.use("/vehiculos", vehiculoRoutes);
 
 process.on("SIGINT", async () => {
-  console.log("\nStopping containers and removing volumes...");
+  console.log("\nDeteniendo contenedores y eliminando volúmenes...");
   try {
     await compose.down({
       cwd: path.resolve(__dirname, "../"),
       log: true,
       commandOptions: ["-v", "--remove-orphans"], // removes volumes
     });
-    console.log("Containers and volumes removed successfully.");
+    console.log("Contenedores y volúmenes eliminados exitosamente.");
   } catch (err) {
-    console.error("Error stopping containers:", err);
+    console.error("Error al detener contenedores:", err);
   } finally {
     process.exit(0);
   }
@@ -95,25 +95,25 @@ async function startServer() {
     await createIndexes();
 
     app.listen(PORT, () => {
-      console.log(`Server running on http://localhost:${PORT}`);
+      console.log(`Servidor corriendo en http://localhost:${PORT}`);
     });
   } catch (error) {
-    console.error("Error starting server:", error);
+    console.error("Error al iniciar el servidor:", error);
     process.exit(1);
   }
 }
 
 async function startContainers() {
-  console.log("Starting containers...");
+  console.log("Iniciando contenedores...");
   try {
     await compose.upMany(["mongodb", "redis"], {
       cwd: path.resolve(__dirname, "../"),
       log: true,
       commandOptions: ["--no-recreate"],
     });
-    console.log("All containers started");
+    console.log("Todos los contenedores iniciados");
   } catch (err) {
-    console.error("Error starting containers:", err);
+    console.error("Error al iniciar contenedores:", err);
   }
 }
 
